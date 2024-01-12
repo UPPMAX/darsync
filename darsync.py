@@ -98,7 +98,7 @@ It will require you to know
     6) Where you want to save the generated SLURM script. 
     """,
 
-                    "local_dir": """\n\nSpecify which directory you want to copy. 
+                    "input_local_dir": """\n\nSpecify which directory you want to copy. 
 Make sure to use tab completion (press the tab key to complete directory names) 
 to avoid spelling errors.
 Ex.
@@ -106,8 +106,31 @@ Ex.
 or
 /proj/naiss2099-22-999/raw_data_only
 
-
 Specify local directory: """,
+
+                    "input_slurm_account": """\n\nSpecify which project id should be used to run the data transfer job in SLURM.
+Ex.
+naiss2099-23-999
+
+Specify project id: """,
+
+                    "input_username": """\n\nSpecify the username that should be used to login at Dardel. It is the username you have created at PDC and it is probably not the same as your UPPMAX username.
+
+Specify Dardel username: """,
+
+                    "input_remote_dir": """\n\nSpecify the directory on Dardel you want to transfer your data to.
+Ex.
+/cfs/klemming/projects/snic/naiss2099-23-999
+
+Specify Dardel path: """,
+
+                    "input_ssh_key": """\n\nSpecify which SSH key should be used to login to Dardel. If non is given it will use the default key, ~/.ssh/id_rsa
+                    
+Specify SSH key: """,
+
+                    "input_outfile": """\n\nSpecify where the SLURM script file should be saved. If not given it will save it here: {outfile_default}
+                    
+Specify SLURM script path: """,
 
                     "uncompressed_warning": """\n\n\nWARNING: files with uncompressed file extensions above the threshold detected:
 
@@ -197,14 +220,15 @@ def check_file_tree(args):
     # print intro message
     print(msg('check_intro'))
 
-    local_dir = args.local_dir or input(msg('local_dir'))
+    local_dir = args.local_dir or input(msg('input_local_dir'))
     while not local_dir:
-        local_dir = args.local_dir or input(msg('local_dir'))
+        local_dir = args.local_dir or input(msg('input_local_dir'))
         # make sure it is a valid directory
         if local_dir:
             if not os.path.isdir(local_dir):
                 print(f"ERROR: not a valid directory, {local_dir}")
                 local_dir = None
+
     if args.prefix:
         prefix = args.prefix
     else:
@@ -304,23 +328,33 @@ def gen_slurm_script(args):
     hostname_default = 'dardel.pdc.kth.se'
     ssh_key_default  = f"{os.environ['HOME']}/.ssh/id_rsa"
     
-    local_dir = None
+    local_dir = args.local_dir or input(msg('input_local_dir'))
     while not local_dir:
-        local_dir = args.local_dir or input(f'Enter directory to transfer (required): ')
+        local_dir = args.local_dir or input(msg('input_local_dir'))
         # make sure it is a valid directory
         if local_dir:
             if not os.path.isdir(local_dir):
                 print(f"ERROR: not a valid directory, {local_dir}")
                 local_dir = None
 
-    slurm_account = args.slurm_account or input(f'Enter SLURM account, i.e. UPPMAX proj id (required): ')
-    username      = args.username or input(f'Enter remote username (required): ')
+    slurm_account = None
+    while not slurm_account:
+        slurm_account = args.slurm_account or input(msg("input_slurm_account"))
+
+    username = None
+    while not username:
+        username = args.username or input(msg("input_username"))
+
+    # don't ask for a hostname, but leave it open to specify another one on commandline
     hostname      = args.hostname or hostname_default
-    remote_dir    = args.remote_dir or input(f'Enter remote path (required): ')
+
+    remote_dir = None
+    while not remote_dir:
+        remote_dir = args.remote_dir or input(msg("input_remote_dir"))
 
     ssh_key = None
     while not ssh_key:
-        ssh_key  = args.ssh_key  or input(f'Enter path to ssh key (default: {ssh_key_default}): ') or ssh_key_default
+        ssh_key  = args.ssh_key  or input(msg("input_ssh_key")) or ssh_key_default
         # make sure the file exists
         if ssh_key:
             if not os.path.isfile(ssh_key):
@@ -328,7 +362,8 @@ def gen_slurm_script(args):
                 ssh_key = None
 
     outfile_default  = f"darsync_{os.path.basename(os.path.abspath(local_dir))}.slurm"
-    outfile          = args.outfile or input(f'Enter name of script file to create (default: {outfile_default}): ') or outfile_default
+
+    outfile = args.outfile or input(msg("input_outfile", outfile_default=outfile_default)) or outfile_default
 
     # Write the SLURM script
     with open(outfile, 'w') as script:

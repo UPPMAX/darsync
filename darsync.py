@@ -213,6 +213,9 @@ def human_readable_size(size, units=('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'Z
     """ Returns a human readable string representation of bytes """
     return "{0:.1f} {1}".format(size, units[0]) if size < 1024 else human_readable_size(size / 1024, units[1:])
 
+#pip install line_profiler
+#kernprof -l darsync.py check -l /path/to/testdir
+#python -m line_profiler darsync.py.lprof
 #@profile
 def check_file_tree(args):
     """ Traverse a directory tree and check for files with 'uncompressed' extensions """

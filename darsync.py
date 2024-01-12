@@ -213,7 +213,7 @@ def human_readable_size(size, units=('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'Z
     """ Returns a human readable string representation of bytes """
     return "{0:.1f} {1}".format(size, units[0]) if size < 1024 else human_readable_size(size / 1024, units[1:])
 
-
+#@profile
 def check_file_tree(args):
     """ Traverse a directory tree and check for files with 'uncompressed' extensions """
 
@@ -260,7 +260,7 @@ def check_file_tree(args):
             dir_file_counter    = 0
 
             # save directory permissions
-            file_info = os.stat(dirpath)
+            file_info = os.lstat(dirpath)
             ownership_file.write(f"{stat.S_IMODE(file_info.st_mode)}\t{file_info.st_uid}\t{file_info.st_gid}\t{dirpath}/\n".encode('utf-8', "surrogateescape"))
 
             for file in filenames:
@@ -269,7 +269,7 @@ def check_file_tree(args):
                 dir_file_counter += 1
                 total_files      += 1
                 full_path = os.path.join(dirpath, file)
-                file_info = os.stat(full_path, follow_symlinks=False)
+                file_info = os.lstat(full_path)
 
                 # Check if file has a 'uncompressed' extension
                 if any(file.endswith(ext) for ext in UNCOMPRESSED_FILE_EXTENSIONS):

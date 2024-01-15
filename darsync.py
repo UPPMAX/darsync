@@ -10,10 +10,8 @@ import stat
 # Define a list of file extensions that are considered 'uncompressed'
 UNCOMPRESSED_FILE_EXTENSIONS = [".sam", ".vcf", ".fq", ".fastq", ".fasta", ".txt", ".fa"]  # Add your own uncompressed file extensions
 
-
-
 def msg(id, lang='en', **kwargs):
-
+    """ Returns a message in the specified language """
     msgs = {'en':
                 {
                     "script_intro": """
@@ -163,6 +161,7 @@ see the file {prefix}.dir_n_files
 
     }
 
+    #
     return msgs[lang][id].format(**kwargs)
 
 
@@ -218,11 +217,14 @@ def human_readable_size(size, units=('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'Z
 #python -m line_profiler darsync.py.lprof
 #@profile
 def check_file_tree(args):
-    """ Traverse a directory tree and check for files with 'uncompressed' extensions """
+    """ Traverse a directory tree and check for files with 'uncompressed' extensions 
+        and directories with too many files
+    """
 
     # print intro message
     print(msg('check_intro'))
 
+    # Get command line arguments
     local_dir = args.local_dir or input(msg('input_local_dir'))
     while not local_dir:
         local_dir = args.local_dir or input(msg('input_local_dir'))
@@ -266,6 +268,7 @@ def check_file_tree(args):
             file_info = os.lstat(dirpath)
             ownership_file.write(f"{stat.S_IMODE(file_info.st_mode)}\t{file_info.st_uid}\t{file_info.st_gid}\t{dirpath}/\n".encode('utf-8', "surrogateescape"))
 
+            # Loop over files in directory
             for file in filenames:
 
                 # count file and get file info
@@ -330,7 +333,8 @@ def gen_slurm_script(args):
     # Get command line arguments, with defaults for hostname and SSH key
     hostname_default = 'dardel.pdc.kth.se'
     ssh_key_default  = f"{os.environ['HOME']}/.ssh/id_rsa"
-    
+
+    # Get command line arguments
     local_dir = args.local_dir or input(msg('input_local_dir'))
     while not local_dir:
         local_dir = args.local_dir or input(msg('input_local_dir'))
@@ -367,6 +371,7 @@ def gen_slurm_script(args):
     outfile_default  = f"darsync_{os.path.basename(os.path.abspath(local_dir))}.slurm"
 
     outfile = args.outfile or input(msg("input_outfile", outfile_default=outfile_default)) or outfile_default
+
 
     # Write the SLURM script
     with open(outfile, 'w') as script:

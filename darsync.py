@@ -383,7 +383,7 @@ def gen_slurm_script(args):
 #SBATCH -n 1
 #SBATCH -J darsync_{os.path.basename(os.path.abspath(local_dir))}
 
-rsync -e "ssh -i {os.path.abspath(ssh_key)}" -cavzP {os.path.abspath(local_dir)} {username}@{hostname}:{remote_dir}
+rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuvz {os.path.abspath(local_dir)} {username}@{hostname}:{remote_dir}
 """)
 
     print(f"""
@@ -421,6 +421,7 @@ parser_gen.add_argument('-u', '--username', help='The username at the remote sys
 parser_gen.add_argument('-H', '--hostname', help='The hostname of the remote system. (default dardel.pdc.kth.se)', default="dardel.pdc.kth.se")
 parser_gen.add_argument('-s', '--ssh-key', help='Path to the private SSH key to use when logging in to the remote system.')
 parser_gen.add_argument('-o', '--outfile', help='Path to the SLURM script to create.')
+parser_gen.add_argument('-d', '--devel', action="store_true", help='Trigger all warnings.')
 parser_gen.set_defaults(func=gen_slurm_script)
 
 # Parse command line arguments

@@ -1,12 +1,22 @@
 # Darsync
 
-Darsync is a tool used to prepare your project for transfer to [Dardel](https://www.pdc.kth.se/hpc-services/computing-systems/dardel). It has two modes; **check mode** where it goes through your files and looks for uncompressed file formats and counts the number of files, and **gen mode** where it generates a script file you can submit to SLURM to do the actual data transfer.
+[Darsync](https://github.com/UPPMAX/darsync) is a tool used to prepare your project for transfer to [Dardel](https://www.pdc.kth.se/hpc-services/computing-systems/dardel). It has two modes; **check mode** where it goes through your files and looks for uncompressed file formats and counts the number of files, and **gen mode** where it generates a script file you can submit to SLURM to do the actual data transfer.
 
-The idea is to first run the check mode and mitigate any problems problems it finds. Once that is done you can run the gen mode and submit the generated script as a job.
+The idea is to 
+
+1. Run the check mode and mitigate any problems problems it finds.
+1. Run the gen mode.
+1. Submit the generated script as a job.
+
+**IMPORTANT**: Until the darsync script is added to the `/sw/uppmax/bin` folder you will have to add its location to your `PATH` variable manually:
+
+```bash
+export PATH=$PATH:/proj/staff/dahlo/testarea/darsync
+```
 
 ## Check mode
 
-To initiate the check mode you run Darsync with the check argument. If you run it without any other arguments it will ask you interactive questions to get the information it needs. 
+To initiate the **check mode** you run Darsync with the check argument. If you run it without any other arguments it will ask you interactive questions to get the information it needs. 
 
 ```bash
 # interactive mode
@@ -70,7 +80,7 @@ To initiate the gen mode you run Darsync with the `gen` argument. If you run it 
 darsync gen
 
 
-# or give it any or all argumentsdirectly
+# or give it any or all arguments directly
 darsync check -l /path/to/dir/on/uppmax/ -r /path/to/dir/on/dardel/ -A naiss2099-23-99 -u dardel_username -s ~/.ssh/id_rsa -o ~/dardel_transfer_script.sh
 ```
 

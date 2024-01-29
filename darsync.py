@@ -373,9 +373,14 @@ def gen_slurm_script(args):
     outfile = args.outfile or input(msg("input_outfile", outfile_default=outfile_default)) or outfile_default
 
 
-    # Write the SLURM script
-    with open(outfile, 'w') as script:
-        script.write(f"""#!/bin/bash -l
+    if args.dryrun:
+        print(f"""
+Dry run.
+Would have created SLURM script: {outfile}
+
+containing the this:
+
+#!/bin/bash -l
 #SBATCH -A {slurm_account}
 #SBATCH -M snowy
 #SBATCH -t 30-00:00:00
@@ -383,11 +388,31 @@ def gen_slurm_script(args):
 #SBATCH -n 1
 #SBATCH -J darsync_{os.path.basename(os.path.abspath(local_dir))}
 
-rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuvz {os.path.abspath(local_dir)} {username}@{hostname}:{remote_dir}
+rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuvz {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
+
 """)
 
-    print(f"""
+    else:
+        # Write the SLURM script
+        with open(outfile, 'w') as script:
+            script.write(f"""#!/bin/bash -l
+#SBATCH -A {slurm_account}
+#SBATCH -M snowy
+#SBATCH -t 30-00:00:00
+#SBATCH -p core
+#SBATCH -n 1
+#SBATCH -J darsync_{os.path.basename(os.path.abspath(local_dir))}
+
+rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuvz {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
+""")
+
+        print(f"""
 Created SLURM script: {outfile}
+
+containing the following command:
+
+rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuvz {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
+
 
 To test if the generated file works, run
 
@@ -421,7 +446,7 @@ parser_gen.add_argument('-u', '--username', help='The username at the remote sys
 parser_gen.add_argument('-H', '--hostname', help='The hostname of the remote system. (default dardel.pdc.kth.se)', default="dardel.pdc.kth.se")
 parser_gen.add_argument('-s', '--ssh-key', help='Path to the private SSH key to use when logging in to the remote system.')
 parser_gen.add_argument('-o', '--outfile', help='Path to the SLURM script to create.')
-parser_gen.add_argument('-d', '--devel', action="store_true", help='Trigger all warnings.')
+parser_gen.add_argument('-d', '--dryrun', action="store_true", help='Dry run, do not actually create the SLURM script.')
 parser_gen.set_defaults(func=gen_slurm_script)
 
 # Parse command line arguments

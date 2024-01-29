@@ -14,6 +14,19 @@ The idea is to
 export PATH=$PATH:/proj/staff/dahlo/testarea/darsync
 ```
 
+## TLDR;
+
+```bash
+# run check
+darsync check -l /path/to/dir
+
+# fix warnings on your own
+
+# book a 30 day single core job on Snowy and run the rsync command
+rsync -e "ssh -i ~/.ssh/id_rsa" -acPuvz /local/path/to/files/ username@dardel.pdc.kth.se:/remote/path/to/files/
+
+```
+
 ## Check mode
 
 To initiate the **check mode** you run Darsync with the check argument. If you run it without any other arguments it will ask you interactive questions to get the information it needs. 

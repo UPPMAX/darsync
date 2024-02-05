@@ -4,6 +4,7 @@
 
 The idea is to 
 
+1. Generate SSH keys for Dardel, either on your own or using the [dardel_ssh-keygen](#dardel-ssh-keygen) script in this repo.
 1. Run the check mode and mitigate any problems problems it finds.
 1. Run the gen mode.
 1. Submit the generated script as a job.
@@ -159,6 +160,19 @@ rsync error: unexplained error (code 255) at io.c(231) [sender=3.2.7]
 ## Troubleshooting
 
 Apart from getting the username or paths wrong, we forsee that the most common problem will be to get the SSH keys generated, added to the [PDC login portal](https://loginportal.pdc.kth.se/), and adding the UPPMAX ip/hostname as authorized for that SSH key. Please see the [PDC user guide on how to set up SSH keys](https://www.pdc.kth.se/support/documents/login/ssh_login.html#ssh-login). Once you have your key created and added to the login portal, go to the login portal again and add the address `*.uppmax.uu.se` to your key to make it work from Rackham.
+
+
+
+# Dardel SSH keygen
+
+If you have never created SSH keys before we have made this helper script that will do it for you. Simply run this command in a terminal that is logged into UPPMAX:
+
+```bash
+dardel_ssh-keygen
+```
+
+and it will create an SSH key that can be used when running Darsync. Since Darsync runs as a SLURM job, it has to be unecrypted (i.e. not require a password to use it). This is not the recommended way to store your SSH keys, so please delete this SSH key once your data transfer is completed. If you still need a SSH key on UPPMAX to connect to Dardel, please create a new one with a password and add that one to the PDC login portal, and delete the key you created for the data transfer.
+
 
 
 

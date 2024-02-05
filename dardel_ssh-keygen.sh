@@ -6,15 +6,23 @@ config_changed=false
 
 # Check if the ssh key file already exists
 while [[ -f ~/.ssh/id-ed25519-pdc ]]; do
-    read -p "The ssh key file already exists. Do you want to overwrite it? (y/n): " overwrite
+    read -p "The ssh key file already exists. Do you want to overwrite it (o), add a password to it (p), or continue without modifying (c)? (o/p/c): " option
 
     # If the user wants to overwrite the file
-    if [[ $overwrite == "y" ]]; then
+    if [[ $option == "o" ]]; then
+
         rm ~/.ssh/id-ed25519-pdc
         key_changed=true
         break
-    elif [[ $overwrite == "n" ]]; then
-        echo "Continuing without creating the ssh key."
+    # If the user wants to add a password
+    elif [[ $option == "p" ]]; then
+        read -s -p "Enter password for the ssh key file: " password
+        ssh-keygen -p -P "" -N "$password" -f ~/.ssh/id-ed25519-pdc
+        key_changed=true
+        break
+    # If the user wants to continue without modifying
+    elif [[ $option == "c" ]]; then
+        echo "Continuing without modifying the ssh key."
         break
     fi
 done

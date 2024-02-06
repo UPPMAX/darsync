@@ -24,11 +24,11 @@ def msg(id, lang='en', **kwargs):
 
 Welcome to the Dardel data transfer tool.
 
-Please run `darsync -h` to see details on how to run the script using commandline options instead of interactive questions.
+Please run `darsync -h` to see details on how to run the script using command line options instead of interactive questions.
 
     
 This tool can do two things;
-    1) analyze a folder and make suggestions what could be done before transfering the data
+    1) analyze a folder and make suggestions what could be done before transferring the data
     2) generate a SLURM script that you can submit to the queue that will run the data transfer.
 
 We recommend that you run the `check` part first and fix any problems it finds, e.g. compressing files and/or removing files. Once that is done you can run this script again and choose `gen` to create a SLURM script that you submit to the queue system to do the actual data transfer.
@@ -44,11 +44,11 @@ check/gen? : """,
  | |___|  _  | |__| |___| . \\
   \____|_| |_|_____\____|_|\_\\
 
-The check module of this script will recursivly go through 
+The check module of this script will recursively go through 
 all the files in, and under, the folder you specify to see if there 
-are any improvments you can to do save space and speed up the data transfer. 
+are any improvements you can to do save space and speed up the data transfer. 
 
-It will look for file formats that are uncompressed, like fasta and vcf files 
+It will look for file formats that are uncompressed, like .fasta and .vcf files 
 (most uncompressed file formats have compressed variants of them that only 
 take up 25% of the space of the uncompressed file).
 
@@ -453,7 +453,7 @@ parser_gen.set_defaults(func=gen_slurm_script)
 args = parser.parse_args()
 
 
-# ask interactivly if no subcommand was sent
+# ask interactively if no subcommand was sent
 if 'func' not in args:
     # If no subcommand given, print help message and exit
     func = input(msg("script_intro"))

@@ -332,7 +332,7 @@ def gen_slurm_script(args):
 
     # Get command line arguments, with defaults for hostname and SSH key
     hostname_default = 'dardel.pdc.kth.se'
-    ssh_key_default  = f"{os.environ['HOME']}/.ssh/id_rsa"
+    ssh_key_default  = f"{os.environ['HOME']}/.ssh/id_ed25519-pdc"
 
     # Get command line arguments
     local_dir = args.local_dir or input(msg('input_local_dir'))

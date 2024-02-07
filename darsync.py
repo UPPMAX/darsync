@@ -187,7 +187,7 @@ def complete_path(text, state):
     dir_path, partial_name = os.path.split(last_arg)
 
     # Get a list of possible matches
-    matches = [f for f in os.listdir(dir_path) if f.startswith(partial_name) and os.path.isdir(os.path.join(dir_path, f))]
+    matches = [f for f in os.listdir(dir_path) if f.startswith(partial_name)] 
 
     # If it's the first tab-completion
     if state == 0:

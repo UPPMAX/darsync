@@ -176,6 +176,8 @@ readline.set_completer_delims(' \t\n=/')
 def complete_path(text, state):
     # Get the current input text
     line = readline.get_line_buffer()
+    # Expand any home folder tildes
+    line = os.path.expanduser(line)
     # Split the line into individual arguments
     args = line.split()
     # Get the last argument (the one being completed)

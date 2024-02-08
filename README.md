@@ -6,7 +6,7 @@ The idea is to
 
 1. Generate SSH keys for Dardel by running this command,
     ```bash
-    ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_ed25519-pdc
+    ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_ed25519_pdc
     ```
 1. Run the check mode and mitigate any problems problems it finds.
 1. Run the gen mode.
@@ -26,7 +26,7 @@ darsync check --local-dir /path/to/dir
 # fix warnings on your own
 
 # book a 30 day single core job on Snowy and run the rsync command
-rsync -e "ssh -i ~/.ssh/id_ed25519-pdc" -acPuvz /local/path/to/files/ username@dardel.pdc.kth.se:/remote/path/to/files/
+rsync -e "ssh -i ~/.ssh/id_ed25519_pdc" -acPuvz /local/path/to/files/ username@dardel.pdc.kth.se:/remote/path/to/files/
 ```
 
 ## Check mode
@@ -100,7 +100,7 @@ To generate a transfer script you will need to supply Darsync with some informat
     - You can see your Dardel username in [SUPR](https://supr.naiss.se/account/)
 * **The path on Dardel** where you want to put your data, e.g. `/cfs/klemming/projects/snic/naiss2099-23-999`
     - Check which project ID you have for your project on Dardel in [the list of active project in SUPR](https://supr.naiss.se/project/).
-* The **path to the SSH key** you have prepared to be used to login from Rackham to Dardel, e.g. `~/.ssh/id_ed25519-pdc`
+* The **path to the SSH key** you have prepared to be used to login from Rackham to Dardel, e.g. `~/.ssh/id_ed25519_pdc`
     - Check 
 * The path to where you want to **save the generated transfer script**.
 
@@ -115,7 +115,7 @@ darsync gen
 
 
 # or give it any or all arguments directly
-darsync check -l /path/to/dir/on/uppmax/ -r /path/to/dir/on/dardel/ -A naiss2099-23-99 -u dardel_username -s ~/.ssh/id_ed25519-pdc -o ~/dardel_transfer_script.sh
+darsync check -l /path/to/dir/on/uppmax/ -r /path/to/dir/on/dardel/ -A naiss2099-23-99 -u dardel_username -s ~/.ssh/id_ed25519_pdc -o ~/dardel_transfer_script.sh
 ```
 
 ## Starting the transfer
@@ -173,7 +173,7 @@ Apart from getting the username or paths wrong, we foresee that the most common 
 If you have never created SSH keys before we have made this helper script that will do it for you. Simply run this command in a terminal that is logged into UPPMAX:
 
 ```bash
-rm ~/.ssh/id_ed25519-pdc
+rm ~/.ssh/id_ed25519_pdc
 ```
 
 and it will create an SSH key that can be used when running Darsync. Since Darsync runs as a SLURM job, it has to be unencrypted (i.e. not require a password to use it). This is not the recommended way to store your SSH keys, so please delete this SSH key once your data transfer is completed. If you still need a SSH key on UPPMAX to connect to Dardel, please create a new one with a password and add that one to the PDC login portal, and delete the key you created for the data transfer.

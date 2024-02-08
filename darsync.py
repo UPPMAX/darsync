@@ -92,7 +92,7 @@ It will require you to know
     4) Where on Dardel it should transfer your data to. 
         ex. /cfs/klemming/projects/snic/naiss2099-23-999/from_uppmax
     5) Which SSH key should be used when connecting to Dardel.
-        ex. /home/user/.ssh/id_ed25519-pdc
+        ex. /home/user/.ssh/id_ed25519_pdc
     6) Where you want to save the generated SLURM script. 
     """,
 
@@ -122,7 +122,7 @@ Ex.
 
 Specify Dardel path: """,
 
-                    "input_ssh_key": """\n\nSpecify which SSH key should be used to login to Dardel. Create one by running `dardel_ssh-keygen` if you have not done so yet. If no path is given it will use the default key created by `dardel_ssh-keygen`, ~/.ssh/id_ed25519-pdc
+                    "input_ssh_key": """\n\nSpecify which SSH key should be used to login to Dardel. Create one by running `dardel_ssh-keygen` if you have not done so yet. If no path is given it will use the default key created by `dardel_ssh-keygen`, ~/.ssh/id_ed25519_pdc
                     
 Specify SSH key: """,
 
@@ -338,7 +338,7 @@ def gen_slurm_script(args):
 
     # Get command line arguments, with defaults for hostname and SSH key
     hostname_default = 'dardel.pdc.kth.se'
-    ssh_key_default  = f"{os.environ['HOME']}/.ssh/id_ed25519-pdc"
+    ssh_key_default  = f"{os.environ['HOME']}/.ssh/id_ed25519_pdc"
 
     # Get command line arguments
     local_dir = args.local_dir or input(msg('input_local_dir'))

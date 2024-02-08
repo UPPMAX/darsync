@@ -241,6 +241,10 @@ def check_file_tree(args):
     else:
         prefix = f"darsync_{os.path.basename(os.path.abspath(local_dir))}"
 
+    # expand tilde
+    local_dir = os.path.expanduser(local_dir)
+    prefix = os.path.expanduser(prefix)
+
     # Initialize variables for tracking file counts and sizes
     total_size           = 0
     uncompressed_files   = []
@@ -342,6 +346,7 @@ def gen_slurm_script(args):
         local_dir = args.local_dir or input(msg('input_local_dir'))
         # make sure it is a valid directory
         if local_dir:
+            local_dir = os.path.expanduser(local_dir)
             if not os.path.isdir(local_dir):
                 print(f"ERROR: not a valid directory, {local_dir}")
                 local_dir = None
@@ -366,14 +371,15 @@ def gen_slurm_script(args):
         ssh_key  = args.ssh_key  or input(msg("input_ssh_key")) or ssh_key_default
         # make sure the file exists
         if ssh_key:
-            if not os.path.isfile(os.path.expanduser(ssh_key)):
+            ssh_key = os.path.expanduser(ssh_key)
+            if not os.path.isfile(ssh_key):
                 print(f"ERROR: file does not exists, {ssh_key}")
                 ssh_key = None
 
     outfile_default  = f"darsync_{os.path.basename(os.path.abspath(local_dir))}.slurm"
 
     outfile = args.outfile or input(msg("input_outfile", outfile_default=outfile_default)) or outfile_default
-
+    outfile = os.path.expanduser(outfile)
 
     if args.dryrun:
         print(f"""

@@ -394,7 +394,7 @@ containing the this:
 #!/bin/bash -l
 #SBATCH -A {slurm_account}
 #SBATCH -M snowy
-#SBATCH -t 30-00:00:00
+#SBATCH -t 10-00:00:00
 #SBATCH -p core
 #SBATCH -n 1
 #SBATCH -J darsync_{os.path.basename(os.path.abspath(local_dir))}
@@ -409,7 +409,7 @@ rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuvz {os.path.abspath(local_dir)
             script.write(f"""#!/bin/bash -l
 #SBATCH -A {slurm_account}
 #SBATCH -M snowy
-#SBATCH -t 30-00:00:00
+#SBATCH -t 10-00:00:00
 #SBATCH -p core
 #SBATCH -n 1
 #SBATCH -J darsync_{os.path.basename(os.path.abspath(local_dir))}

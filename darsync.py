@@ -366,7 +366,7 @@ def gen_slurm_script(args):
         ssh_key  = args.ssh_key  or input(msg("input_ssh_key")) or ssh_key_default
         # make sure the file exists
         if ssh_key:
-            if not os.path.isfile(ssh_key):
+            if not os.path.isfile(os.path.expanduser(ssh_key)):
                 print(f"ERROR: file does not exists, {ssh_key}")
                 ssh_key = None
 

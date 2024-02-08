@@ -242,8 +242,8 @@ def check_file_tree(args):
         prefix = f"darsync_{os.path.basename(os.path.abspath(local_dir))}"
 
     # expand tilde
-    local_dir = os.path.expanduser(local_dir)
-    prefix = os.path.expanduser(prefix)
+    local_dir = os.path.abspath(os.path.expanduser(local_dir))
+    prefix = os.path.abspath(os.path.expanduser(prefix))
 
     # Initialize variables for tracking file counts and sizes
     total_size           = 0
@@ -379,10 +379,13 @@ def gen_slurm_script(args):
     outfile_default  = f"darsync_{os.path.basename(os.path.abspath(local_dir))}.slurm"
 
     outfile = args.outfile or input(msg("input_outfile", outfile_default=outfile_default)) or outfile_default
-    outfile = os.path.expanduser(outfile)
+    outfile = os.path.abspath(os.path.expanduser(outfile))
 
     if args.dryrun:
         print(f"""
+
+
+
 Dry run.
 Would have created SLURM script: {outfile}
 
@@ -415,6 +418,9 @@ rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuvz {os.path.abspath(local_dir)
 """)
 
         print(f"""
+
+
+
 Created SLURM script: {outfile}
 
 containing the following command:

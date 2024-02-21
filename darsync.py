@@ -2,10 +2,12 @@
 
 import argparse
 import os
+import sys
 import pdb
 import gzip
 import readline
 import stat
+import subprocess
 
 # Define a list of file extensions that are considered 'uncompressed'
 UNCOMPRESSED_FILE_EXTENSIONS = [".sam", ".vcf", ".fq", ".fastq", ".fasta", ".txt", ".fa"]  # Add your own uncompressed file extensions
@@ -92,9 +94,27 @@ It will require you to know
     4) Where on Dardel it should transfer your data to. 
         ex. /cfs/klemming/projects/snic/naiss2099-23-999/from_uppmax
     5) Which SSH key should be used when connecting to Dardel.
-        ex. /home/user/.ssh/id_ed25519_pdc
+        ex. /home/user/id_ed25519_pdc
     6) Where you want to save the generated SLURM script. 
     """,
+
+                    "sshkey_intro": """\n
+  ____ ____  _   _ _  _________   __
+ / ___/ ___|| | | | |/ / ____\ \ / /
+ \___ \___ \| |_| | ' /|  _|  \ V /
+  ___) |__) |  _  | . \| |___  | |
+ |____/____/|_| |_|_|\_\_____| |_|
+        
+The sshkey module of this script will generate a SSH key pair that you can use to login to Dardel.
+It will create two files, one with the private key and one with the public key.
+The private key should be kept secret and the public key should be added to your authorized_keys file on Dardel.
+""",
+
+                    "sshkey_outro": """\n\n
+You will now have to add the public key above to the Dardel Login Portal, https://loginportal.pdc.kth.se
+
+See the user guide for more info about this, http://docs.uppmax.uu.se/cluster_guides/migrate_dardel/#4-add-the-public-key-to-the-pdc-login-portal.
+""",
 
                     "input_local_dir": """\n\nSpecify which directory you want to copy. 
 Make sure to use tab completion (press the tab key to complete directory names) 
@@ -122,7 +142,7 @@ Ex.
 
 Specify Dardel path: """,
 
-                    "input_ssh_key": """\n\nSpecify which SSH key should be used to login to Dardel. Create one by running `dardel_ssh-keygen` if you have not done so yet. If no path is given it will use the default key created by `dardel_ssh-keygen`, ~/.ssh/id_ed25519_pdc
+                    "input_ssh_key": """\n\nSpecify which SSH key should be used to login to Dardel. Create one by running `dardel_ssh-keygen` if you have not done so yet. If no path is given it will use the default key created by `dardel_ssh-keygen`, ~/id_ed25519_pdc
                     
 Specify SSH key: """,
 
@@ -338,7 +358,7 @@ def gen_slurm_script(args):
 
     # Get command line arguments, with defaults for hostname and SSH key
     hostname_default = 'dardel.pdc.kth.se'
-    ssh_key_default  = f"{os.environ['HOME']}/.ssh/id_ed25519_pdc"
+    ssh_key_default  = f"{os.environ['HOME']}/id_ed25519_pdc"
 
     # Get command line arguments
     local_dir = args.local_dir or input(msg('input_local_dir'))
@@ -440,6 +460,39 @@ sbatch {outfile}""")
 
 
 
+
+
+def create_ssh_keys(args):
+    """ Generate ssh keys for the user """
+
+    # print intro message
+    print(msg('sshkey_intro'))
+
+    # Get command line arguments
+    output = args.output or f"{os.environ['HOME']}/id_ed25519_pdc"
+
+    # generate the key
+    process = subprocess.run(f"yes | ssh-keygen -q -N '' -t ed25519 -f {output}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout = process.stdout
+    stderr = process.stderr
+    print(stdout.decode('utf-8'))
+    print("\n", stderr.decode('utf-8'))
+
+    # make sure the file exists
+    if not os.path.isfile(output):
+        print(f"ERROR: something went wrong with the SSH key creation, file does not exist:  {output}")
+        sys.exit(1)
+
+    # print the result
+    print(f"""Created SSH key: {output} and {output}.pub
+
+Content of the public key:
+
+{open(output + ".pub").read()}""")
+
+    # print intro message
+    print(msg('sshkey_outro'))
+
 # Set up argument parser and subcommands
 parser = argparse.ArgumentParser()
 subparsers = parser.add_subparsers()
@@ -462,6 +515,11 @@ parser_gen.add_argument('-s', '--ssh-key', help='Path to the private SSH key to 
 parser_gen.add_argument('-o', '--outfile', help='Path to the SLURM script to create.')
 parser_gen.add_argument('-d', '--dryrun', action="store_true", help='Dry run, do not actually create the SLURM script.')
 parser_gen.set_defaults(func=gen_slurm_script)
+
+# 'sshkey' subcommand
+parser_sshkey = subparsers.add_parser('sshkey', description='Generates a SSH key pair that can be used to login to Dardel.')
+parser_sshkey.add_argument('-o', '--output', help='Path to where the key will be created. (deafult: ~/id_ed25519_pdc)')
+parser_sshkey.set_defaults(func=create_ssh_keys)
 
 # Parse command line arguments
 args = parser.parse_args()
@@ -491,10 +549,15 @@ if 'func' not in args:
 
             # call the generate function
             check_file_tree(args)
+        elif func == 'sshkey':
+            run = False
+            # init a argparse namespace to get the correct defaults etc
+            subcommand_namespace = parser_sshkey.parse_args()
+            args.__dict__.update(subcommand_namespace.__dict__)
         else:
             func = input(f"""
 Invalid choice.
-check/gen? : """)
+check/gen/sshkey? : """)
 
 else:
     # Call the function associated with the given subcommand

@@ -419,7 +419,7 @@ containing the this:
 #SBATCH -n 1
 #SBATCH -J darsync_{os.path.basename(os.path.abspath(local_dir))}
 
-rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuvz {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
+rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuv {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
 
 """)
 
@@ -434,7 +434,7 @@ rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuvz {os.path.abspath(local_dir)
 #SBATCH -n 1
 #SBATCH -J darsync_{os.path.basename(os.path.abspath(local_dir))}
 
-rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuvz {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
+rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuv {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
 """)
 
         print(f"""

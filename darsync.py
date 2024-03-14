@@ -90,12 +90,14 @@ It will require you to know
     1) Which directory on UPPMAX you want to transfer (local directory).
     2) Which UPPMAX project id the SLURM job should be run under. 
         ex. naiss2099-23-999
-    3) Which username you have at Dardel.
-    4) Where on Dardel it should transfer your data to. 
+    3) Which cluster the SLURM job should be run on.
+        ex. rackham, snowy
+    4) Which username you have at Dardel.
+    5) Where on Dardel it should transfer your data to. 
         ex. /cfs/klemming/projects/snic/naiss2099-23-999/from_uppmax
-    5) Which SSH key should be used when connecting to Dardel.
+    6) Which SSH key should be used when connecting to Dardel.
         ex. /home/user/id_ed25519_pdc
-    6) Where you want to save the generated SLURM script. 
+    7) Where you want to save the generated SLURM script. 
     """,
 
                     "sshkey_intro": """\n
@@ -131,6 +133,12 @@ Ex.
 naiss2099-23-999
 
 Specify project id: """,
+
+                    "input_cluster": """\n\nSpecify which cluster the SLURM job should be run on.
+Choose between rackham and snowy.
+Default is rackham
+
+Specify cluster: """,
 
                     "input_username": """\n\nSpecify the username that should be used to login at Dardel. It is the username you have created at PDC and it is probably not the same as your UPPMAX username.
 
@@ -359,6 +367,7 @@ def gen_slurm_script(args):
     # Get command line arguments, with defaults for hostname and SSH key
     hostname_default = 'dardel.pdc.kth.se'
     ssh_key_default  = f"{os.environ['HOME']}/id_ed25519_pdc"
+    cluster_default  = 'rackham'
 
     # Get command line arguments
     local_dir = args.local_dir or input(msg('input_local_dir'))
@@ -374,6 +383,11 @@ def gen_slurm_script(args):
     slurm_account = None
     while not slurm_account:
         slurm_account = args.slurm_account or input(msg("input_slurm_account"))
+
+    cluster = None
+    cluster = args.cluster or input(msg("input_cluster")) or cluster_default
+    if cluster not in ['rackham', 'snowy']:
+        print(f"WARNING: Cluster not rackham or snowy, {cluster}")
 
     username = None
     while not username:
@@ -413,13 +427,13 @@ containing the this:
 
 #!/bin/bash -l
 #SBATCH -A {slurm_account}
-#SBATCH -M snowy
+#SBATCH -M {cluster}
 #SBATCH -t 10-00:00:00
 #SBATCH -p core
 #SBATCH -n 1
 #SBATCH -J darsync_{os.path.basename(os.path.abspath(local_dir))}
 
-rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuv {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
+rsync -e "ssh -i {os.path.abspath(ssh_key)} -o StrictHostKeyChecking=no" -acPuv {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
 
 """)
 
@@ -428,13 +442,13 @@ rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuv {os.path.abspath(local_dir)}
         with open(outfile, 'w') as script:
             script.write(f"""#!/bin/bash -l
 #SBATCH -A {slurm_account}
-#SBATCH -M snowy
+#SBATCH -M {cluster}
 #SBATCH -t 10-00:00:00
 #SBATCH -p core
 #SBATCH -n 1
 #SBATCH -J darsync_{os.path.basename(os.path.abspath(local_dir))}
 
-rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuv {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
+rsync -e "ssh -i {os.path.abspath(ssh_key)} -o StrictHostKeyChecking=no" -acPuv {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
 """)
 
         print(f"""
@@ -445,7 +459,7 @@ Created SLURM script: {outfile}
 
 containing the following command:
 
-rsync -e "ssh -i {os.path.abspath(ssh_key)}" -acPuvz {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
+rsync -e "ssh -i {os.path.abspath(ssh_key)} -o StrictHostKeyChecking=no" -acPuv {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
 
 
 To test if the generated file works, run
@@ -509,6 +523,7 @@ parser_gen = subparsers.add_parser('gen', description='Generates a SLURM script 
 parser_gen.add_argument('-l', '--local-dir', help='Path to local directory to transfer.')
 parser_gen.add_argument('-r', '--remote-dir', help='Path to the destination directory on the remote system.')
 parser_gen.add_argument('-A', '--slurm-account', help='Which SLURM account to run the job as (UPPMAX proj id).')
+parser_gen.add_argument('-M', '--cluster', help='Which cluster to run the job on (default: rackham).')
 parser_gen.add_argument('-u', '--username', help='The username at the remote system.')
 parser_gen.add_argument('-H', '--hostname', help='The hostname of the remote system. (default dardel.pdc.kth.se)', default="dardel.pdc.kth.se")
 parser_gen.add_argument('-s', '--ssh-key', help='Path to the private SSH key to use when logging in to the remote system.')

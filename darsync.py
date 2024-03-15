@@ -26,16 +26,24 @@ def msg(id, lang='en', **kwargs):
 
 Welcome to the Dardel data transfer tool.
 
-Please run `darsync -h` to see details on how to run the script using command line options instead of interactive questions.
+Please run `darsync -h` to see details on how to run the script 
+using command line options instead of interactive questions.
 
     
 This tool can do two things;
-    1) analyze a folder and make suggestions what could be done before transferring the data
-    2) generate a SLURM script that you can submit to the queue that will run the data transfer.
+    1) analyze a folder and make suggestions what could be 
+       done before transferring the data.
+    2) generate a SLURM script that you can submit to the 
+       queue that will run the data transfer.
 
-We recommend that you run the `check` part first and fix any problems it finds, e.g. compressing files and/or removing files. Once that is done you can run this script again and choose `gen` to create a SLURM script that you submit to the queue system to do the actual data transfer.
+We recommend that you run the `check` part first and fix any problems it finds, 
+e.g. compressing files and/or removing files. Once that is done you can run 
+this script again and choose `gen` to create a SLURM script that you submit 
+to the queue system to do the actual data transfer.
     
-You now have to choose which of these two things you want to do. Type `check` (without the quotes) to start the analysis mode, or type `gen` (without the quotes) to generate the SLURM script.
+You now have to choose which of these two things you want to do. 
+Type `check` (without the quotes) to start the analysis mode, 
+or type `gen` (without the quotes) to generate the SLURM script.
     
 check/gen? : """,
 
@@ -60,17 +68,27 @@ you want to transfer. Large folders like this can be archived/packed into
 a single file to speed things up.""",
 
                     "check_outro": """\n\n
-Checking completed. Unless you got any warning messages above you should be good to go.
+  ____   ___  _   _ _____ 
+ |  _ \ / _ \| \ | | ____|
+ | | | | | | |  \| |  _|  
+ | |_| | |_| | |\  | |___ 
+ |____/ \___/|_| \_|_____|
 
-Generate a SLURM script file to do the transfer by running this script again, but use the 'gen' option this time.
-See the help message for details, or continue reading the user guide for examples on how to run it.
+Checking completed. Unless you got any warning messages above you 
+should be good to go.
+
+Generate a SLURM script file to do the transfer by running this script again, 
+but use the 'gen' option this time. See the help message for details, 
+or continue reading the user guide for examples on how to run it.
 
 darsync gen -h
 
 A file containing file ownership information, 
-{prefix}.ownership.gz
+{ownership_file_path},
 has been created. This file can be used to make sure that the
-file ownership (user/group) will look the same on Dardel as it does here. See http://docs.uppmax.uu.se/cluster_guides/dardel_migration/#52-check-for-problems for more info about this.
+file ownership (user/group) will look the same on Dardel as it does here. 
+See http://docs.uppmax.uu.se/cluster_guides/dardel_migration/#52-check-for-problems 
+for more info about this.
     """,
 
                     "gen_intro": """\n
@@ -97,8 +115,37 @@ It will require you to know
     6) Which SSH key should be used when connecting to Dardel.
         ex. /home/user/id_ed25519_pdc
     7) Where you want to save the generated SLURM script. 
-    """,
+""",
 
+
+                    "gen_outro": """
+
+  ____   ___  _   _ _____ 
+ |  _ \ / _ \| \ | | ____|
+ | | | | | | |  \| |  _|  
+ | |_| | |_| | |\  | |___ 
+ |____/ \___/|_| \_|_____|
+
+
+Created SLURM script: {outfile}
+
+containing the following command:
+
+rsync -e "ssh -i {ssh_key} -o StrictHostKeyChecking=no" -acPuv {local_dir}/ {username}@{hostname}:{remote_dir}
+
+
+To test if the generated file works, run
+
+bash {outfile}
+
+If the transfer starts you know the script is working, and you can terminate 
+it by pressing ctrl+c and submit the script as a SLURM job.
+
+Run this command to submit it as a job:
+
+sbatch {outfile}
+
+""",
                     "sshkey_intro": """\n
   ____ ____  _   _ _  _________   __
  / ___/ ___|| | | | |/ / ____\ \ / /
@@ -114,7 +161,8 @@ The private key should be kept secret and the public key should be added to your
                     "sshkey_outro": """\n\n
 You will now have to add the public key above to the Dardel Login Portal, https://loginportal.pdc.kth.se
 
-See the user guide for more info about this, http://docs.uppmax.uu.se/cluster_guides/migrate_dardel/#4-add-the-public-key-to-the-pdc-login-portal.
+See the user guide for more info about this, 
+http://docs.uppmax.uu.se/cluster_guides/migrate_dardel/#4-add-the-public-key-to-the-pdc-login-portal.
 """,
 
                     "input_local_dir": """\n\nSpecify which directory you want to copy. 
@@ -139,7 +187,9 @@ Default is rackham
 
 Specify cluster: """,
 
-                    "input_username": """\n\nSpecify the username that should be used to login at Dardel. It is the username you have created at PDC and it is probably not the same as your UPPMAX username.
+                    "input_username": """\n\nSpecify the username that should be used to login at Dardel. 
+It is the username you have created at PDC and it is 
+probably not the same as your UPPMAX username.
 
 Specify Dardel username: """,
 
@@ -149,11 +199,15 @@ Ex.
 
 Specify Dardel path: """,
 
-                    "input_ssh_key": """\n\nSpecify which SSH key should be used to login to Dardel. Create one by running `dardel_ssh-keygen` if you have not done so yet. If no path is given it will use the default key created by `dardel_ssh-keygen`, ~/id_ed25519_pdc
+                    "input_ssh_key": """\n\nSpecify which SSH key should be used to login to Dardel. 
+Create one by running `dardel_ssh-keygen` if you have not done so yet. 
+If no path is given it will use the default key created by `dardel_ssh-keygen`, 
+~/id_ed25519_pdc
                     
 Specify SSH key: """,
 
-                    "input_outfile": """\n\nSpecify where the SLURM script file should be saved. If not given it will save it here: {outfile_default}
+                    "input_outfile": """\n\nSpecify where the SLURM script file should be saved. 
+If not given it will save it here: {outfile_default}
                     
 Specify SLURM script path: """,
 
@@ -187,7 +241,7 @@ see the file {prefix}.dir_n_files
 
     }
 
-    #
+    
     return msgs[lang][id].format(**kwargs)
 
 
@@ -270,6 +324,7 @@ def check_file_tree(args):
     # expand tilde
     local_dir = os.path.abspath(os.path.expanduser(local_dir))
     prefix = os.path.abspath(os.path.expanduser(prefix))
+    prefix_basename = os.path.basename(prefix)
 
     # Initialize variables for tracking file counts and sizes
     total_size           = 0
@@ -283,8 +338,8 @@ def check_file_tree(args):
     dir_files_limit      =  100000 # 100K
     previous_dirpath_len = 0
 
-    # open ownership file
-    with gzip.open(f"{prefix}.ownership.gz", 'wb') as ownership_file:
+    # save ownership file in the folder to be transfered
+    with gzip.open(f"{local_dir}/{prefix_basename}.ownership.gz", 'wb') as ownership_file:
 
         # Walk the directory tree
         for dirpath, dirnames, filenames in os.walk(local_dir):
@@ -352,7 +407,7 @@ def check_file_tree(args):
             for dir, n_files in crowded_dirs:
                 logfile.write(f"{n_files} {dir}\n")
 
-    print(msg('check_outro', prefix=prefix))
+    print(msg('check_outro', ownership_file_path=f"{local_dir}/{prefix_basename}.ownership.gz"))
 
 
 
@@ -453,28 +508,7 @@ rsync -e "ssh -i {os.path.abspath(ssh_key)} -o StrictHostKeyChecking=no" -acPuv 
 rsync -e "ssh -i {os.path.abspath(ssh_key)} -o StrictHostKeyChecking=no" -acPuv {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
 """)
 
-        print(f"""
-
-
-
-Created SLURM script: {outfile}
-
-containing the following command:
-
-rsync -e "ssh -i {os.path.abspath(ssh_key)} -o StrictHostKeyChecking=no" -acPuv {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
-
-
-To test if the generated file works, run
-
-bash {outfile}
-
-If the transfer starts you know the script is working, and you can terminate it by pressing ctrl+c and submit the script as a SLURM job.
-
-Run this command to submit it as a job:
-
-sbatch {outfile}""")
-
-
+        print(msg('gen_outro', outfile=outfile, ssh_key=os.path.abspath(ssh_key), local_dir=os.path.abspath(local_dir), username=username, hostname=hostname, remote_dir=remote_dir))
 
 
 

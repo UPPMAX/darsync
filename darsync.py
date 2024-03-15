@@ -64,14 +64,13 @@ Checking completed. Unless you got any warning messages above you should be good
 
 Generate a SLURM script file to do the transfer by running this script again, but use the 'gen' option this time.
 See the help message for details, or continue reading the user guide for examples on how to run it.
-https://
 
 darsync gen -h
 
 A file containing file ownership information, 
 {prefix}.ownership.gz
 has been created. This file can be used to make sure that the
-file ownership (user/group) will look the same on Dardel as it does here. See https:// for more info about this.
+file ownership (user/group) will look the same on Dardel as it does here. See http://docs.uppmax.uu.se/cluster_guides/dardel_migration/#52-check-for-problems for more info about this.
     """,
 
                     "gen_intro": """\n
@@ -168,7 +167,6 @@ If the total file size of all files with uncompressed file extensions exceed {hu
 you should consider compressing them or converting them to a better file format.
 Doing that will save you disk space as compressed formats are roughly 75% smaller 
 than uncompressed. Your project could save up to {human_readable_save_size} by doing this.
-See https:// for more info about this.
 
 Uncompressed file extensions are common file formats that are uncompressed,
 e.g. {UNCOMPRESSED_FILE_EXTENSIONS_STR}
@@ -267,7 +265,7 @@ def check_file_tree(args):
     if args.prefix:
         prefix = args.prefix
     else:
-        prefix = f"darsync_{os.path.basename(os.path.abspath(local_dir))}"
+        prefix = f"~/darsync_{os.path.basename(os.path.abspath(local_dir))}"
 
     # expand tilde
     local_dir = os.path.abspath(os.path.expanduser(local_dir))
@@ -410,7 +408,7 @@ def gen_slurm_script(args):
                 print(f"ERROR: file does not exists, {ssh_key}")
                 ssh_key = None
 
-    outfile_default  = f"darsync_{os.path.basename(os.path.abspath(local_dir))}.slurm"
+    outfile_default  = f"~/darsync_{os.path.basename(os.path.abspath(local_dir))}.slurm"
 
     outfile = args.outfile or input(msg("input_outfile", outfile_default=outfile_default)) or outfile_default
     outfile = os.path.abspath(os.path.expanduser(outfile))
@@ -432,6 +430,8 @@ containing the this:
 #SBATCH -p core
 #SBATCH -n 1
 #SBATCH -J darsync_{os.path.basename(os.path.abspath(local_dir))}
+#SBATCH --output={os.path.abspath(os.path.expanduser("~/"))}/darsync_{os.path.basename(os.path.abspath(local_dir))}.out
+#SBATCH --error={os.path.abspath(os.path.expanduser("~/"))}/darsync_{os.path.basename(os.path.abspath(local_dir))}.err
 
 rsync -e "ssh -i {os.path.abspath(ssh_key)} -o StrictHostKeyChecking=no" -acPuv {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
 
@@ -447,6 +447,8 @@ rsync -e "ssh -i {os.path.abspath(ssh_key)} -o StrictHostKeyChecking=no" -acPuv 
 #SBATCH -p core
 #SBATCH -n 1
 #SBATCH -J darsync_{os.path.basename(os.path.abspath(local_dir))}
+#SBATCH --output={os.path.abspath(os.path.expanduser("~/"))}/darsync_{os.path.basename(os.path.abspath(local_dir))}.out
+#SBATCH --error={os.path.abspath(os.path.expanduser("~/"))}/darsync_{os.path.basename(os.path.abspath(local_dir))}.err
 
 rsync -e "ssh -i {os.path.abspath(ssh_key)} -o StrictHostKeyChecking=no" -acPuv {os.path.abspath(local_dir)}/ {username}@{hostname}:{remote_dir}
 """)
@@ -514,7 +516,7 @@ subparsers = parser.add_subparsers()
 # 'check' subcommand
 parser_check = subparsers.add_parser('check', description='Checks if a file tree contains uncompressed file formats or too many files.')
 parser_check.add_argument('-l', '--local-dir', help='Path to directory to check.')
-parser_check.add_argument('-p', '--prefix', help='Path and prefix to where log files should be created. (default: ./darsync_foldername)')
+parser_check.add_argument('-p', '--prefix', help='Path and prefix to where log files should be created. (default: ~/darsync_foldername)')
 parser_check.add_argument('-d', '--devel', action="store_true", help='Trigger all warnings.')
 parser_check.set_defaults(func=check_file_tree)
 

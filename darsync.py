@@ -162,7 +162,7 @@ The private key should be kept secret and the public key should be added to your
 You will now have to add the public key above to the Dardel Login Portal, https://loginportal.pdc.kth.se
 
 See the user guide for more info about this, 
-http://docs.uppmax.uu.se/cluster_guides/migrate_dardel/#4-add-the-public-key-to-the-pdc-login-portal.
+http://docs.uppmax.uu.se/software/ssh_key_use_dardel/#2-how-to-add-an-ssh-key-to-the-pdc-login-portal
 """,
 
                     "input_local_dir": """\n\nSpecify which directory you want to copy. 
@@ -227,9 +227,12 @@ e.g. {UNCOMPRESSED_FILE_EXTENSIONS_STR}
 
 To see a list of all files with uncompressed file extensions found,
 see the file {prefix}.uncompressed
+
+See http://docs.uppmax.uu.se/cluster_guides/dardel_migration/#52-check-for-problems for more info about this.
+
 -----------------------------------------------------------------""",
                     "too_many_files_warning": """\n\n\nWARNING: Total number of files, or number of files in a single directory
-exceeding threshold. See https:// for more info about this.
+exceeding threshold. See http://docs.uppmax.uu.se/cluster_guides/dardel_migration/#52-check-for-problems for more info about this.
 
 {crowded_dirs_len}\tdirectories with more than {dir_files_limit} files found
 {total_files}\tfiles in total (warning threshold: {files_limit})

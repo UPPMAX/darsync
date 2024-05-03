@@ -387,6 +387,9 @@ def check_file_tree(args):
 
 
 
+    # set file permissions for the ownership file
+    os.chmod(f"{local_dir}/{prefix_basename}.ownership.gz", 0o650)
+
     # Sort files by size
     uncompressed_files.sort(key=lambda x: x[1], reverse=True)
 
